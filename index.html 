@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Studio Devs</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        body {
+            background-color: #0b0e14;
+            color: #ffffff;
+            display: flex;
+            justify-content: center;
+            padding: 10px;
+        }
+        .app-container {
+            width: 100%;
+            max-width: 480px;
+            background: #0b0e14;
+            min-height: 100vh;
+            padding-bottom: 30px;
+        }
+        /* Header */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            padding: 15px 10px 10px 10px;
+        }
+        .header h1 {
+            font-size: 24px;
+            font-weight: bold;
+        }
+        .header p {
+            font-size: 13px;
+            color: #8b949e;
+            margin-top: 2px;
+        }
+        .settings-btn {
+            background: none;
+            border: none;
+            color: #ffffff;
+            font-size: 22px;
+            cursor: pointer;
+            padding: 5px;
+        }
+        /* Stats Bar */
+        .stats-bar {
+            display: flex;
+            gap: 15px;
+            padding: 0 10px 15px 10px;
+            font-size: 13px;
+        }
+        .stat-badge {
+            background: #151a21;
+            padding: 6px 12px;
+            border-radius: 20px;
+            border: 1px solid #222b36;
+        }
+        /* Search Bar */
+        .search-container {
+            padding: 0 10px 15px 10px;
+        }
+        .search-box {
+            display: flex;
+            align-items: center;
+            background: #151a21;
+            border: 1px solid #222b36;
+            border-radius: 25px;
+            padding: 10px 15px;
+            gap: 10px;
+        }
+        .search-box input {
+            background: none;
+            border: none;
+            color: white;
+            width: 100%;
+            outline: none;
+            font-size: 14px;
+        }
+        /* Categories Scroll */
+        .categories {
+            display: flex;
+            gap: 8px;
+            padding: 0 10px 15px 10px;
+            overflow-x: auto;
+            scrollbar-width: none;
+        }
+        .categories::-webkit-scrollbar { display: none; }
+        .cat-btn {
+            background: #151a21;
+            color: #ffffff;
+            border: 1px solid #222b36;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 13px;
+            white-space: nowrap;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .cat-btn.active, .cat-btn:hover {
+            background: #2ecc71;
+            color: #000000;
+            font-weight: bold;
+            border-color: #2ecc71;
+        }
+        /* Cards List */
+        .cards-list {
+            padding: 0 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        .card {
+            background: #151a21;
+            border-radius: 16px;
+            overflow: hidden;
+            border: 1px solid #222b36;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        }
+        .card-img {
+            width: 100%;
+            height: 160px;
+            object-fit: cover;
+            background: #222b36;
+        }
+        .card-body {
+            padding: 15px;
+        }
+        .card-title {
+            font-size: 16px;
+            font-weight: bold;
+            margin-bottom: 6px;
+        }
+        .card-desc {
+            font-size: 13px;
+            color: #8b949e;
+            margin-bottom: 12px;
+            line-height: 1.4;
+        }
+        .card-creator {
+            font-size: 13px;
+            color: #3498db;
+            margin-bottom: 10px;
+        }
+        .card-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-top: 1px solid #222b36;
+            padding-top: 10px;
+        }
+        .card-id {
+            font-size: 13px;
+            font-family: monospace;
+            color: #2ecc71;
+        }
+        .copy-btn {
+            background: #2ecc71;
+            color: #000;
+            border: none;
+            padding: 6px 14px;
+            border-radius: 8px;
+            font-weight: bold;
+            font-size: 12px;
+            cursor: pointer;
+        }
+        .copy-btn:active { opacity: 0.8; }
+        .no-results {
+            text-align: center;
+            color: #8b949e;
+            padding: 30px;
+            font-size: 14px;
+        }
+        /* Footer branding */
+        .app-footer {
+            text-align: center;
+            font-size: 12px;
+            color: #6e7681;
+            margin-top: 30px;
+            padding: 10px;
+        }
+        /* Admin Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.85);
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            z-index: 1000;
+        }
+        .modal-content {
+            background: #151a21;
+            padding: 20px;
+            border-radius: 16px;
+            width: 100%;
+            max-width: 420px;
+            border: 1px solid #2a3442;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        .modal-content h3 {
+            margin-bottom: 15px;
+            color: #2ecc71;
+        }
+        .modal-content label {
+            font-size: 12px;
+            color: #8b949e;
+            display: block;
+            margin-bottom: 4px;
+        }
+        .modal-content input, .modal-content select, .modal-content textarea {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 12px;
+            background: #0b0e14;
+            border: 1px solid #2a3442;
+            color: white;
+            border-radius: 8px;
+            font-size: 13px;
+        }
+        .modal-buttons {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        .modal-buttons button {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .btn-save { background: #2ecc71; color: #000; }
+        .btn-cancel { background: #e74c3c; color: white; }
+        .admin-item {
+            background: #0b0e14;
+            padding: 10px;
+            border-radius: 8px;
+            margin-top: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border: 1px solid #2a3442;
+            font-size: 13px;
+        }
+        .admin-actions button {
+            padding: 5px 8px;
+            margin-left: 4px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 11px;
+        }
+        .btn-edit { background: #f39c12; color: white; }
+        .btn-del { background: #e74c3c; color: white; }
+    </style>
+</head>
+<body>
+
+    <div class="app-container">
+        <!-- Header -->
+        <div class="header">
+            <div>
+                <h1>Studio Devs</h1>
+                <p>Modelos, Kits & Scripts Móviles<br>Creador de esta página: htt_sii</p>
+            </div>
+            <button class="settings-btn" onclick="pedirPassword()">⚙️</button>
+        </div>
+
+        <!-- Stats Bar -->
+        <div class="stats-bar">
+            <div class="stat-badge">🟢 En línea: 6</div>
+            <div class="stat-badge">📦 Descargas: 1249</div>
+        </div>
+
+        <!-- Search Bar -->
+        <div class="search-container">
+            <div class="search-box">
+                <span>🔍</span>
+                <input type="text" id="searchInput" placeholder="Buscar modelos, kits o creadores..." oninput="filtrarKits()">
+            </div>
+        </div>
+
+        <!-- Categories -->
+        <div class="categories">
+            <button class="cat-btn active" onclick="cambiarCategoria('Todos', this)">Todos</button>
+            <button class="cat-btn" onclick="cambiarCategoria('Alta Demanda', this)">🔥 Alta Demanda</button>
+            <button class="cat-btn" onclick="cambiarCategoria('Kits', this)">Kits</button>
+            <button class="cat-btn" onclick="cambiarCategoria('Modelos', this)">Modelos</button>
+            <button class="cat-btn" onclick="cambiarCategoria('Scripts', this)">Scripts</button>
+            <button class="cat-btn" onclick="cambiarCategoria('UI / Menús', this)">UI / Menús</button>
+        </div>
+
+        <!-- Cards Container -->
+        <div class="cards-list" id="cardsContainer">
+            <!-- Se carga dinámicamente con JavaScript -->
+        </div>
+
+        <!-- Footer -->
+        <div class="app-footer">
+            © 2026 Studio Devs. Todos los derechos reservados.<br>
+            Creador Oficial y Autoría: htt_sii. Registrado bajo Copyright.
+        </div>
+    </div>
+
+    <!-- PANEL DE ADMINISTRACIÓN / MODAL -->
+    <div id="adminModal" class="modal">
+        <div class="modal-content">
+            <h3>⚙️ Panel de Administración</h3>
+            
+            <input type="hidden" id="kitId">
+            <label>Nombre del Kit / Modelo:</label>
+            <input type="text" id="kitNombre" placeholder="Ej: Sistema de Dinero">
+            
+            <label>Categoría:</label>
+            <select id="kitCategoria">
+                <option value="Alta Demanda">🔥 Alta Demanda</option>
+                <option value="Kits">Kits</option>
+                <option value="Modelos">Modelos</option>
+                <option value="Scripts">Scripts</option>
+                <option value="UI / Menús">UI / Menús</option>
+            </select>
+
+            <label>Descripción:</label>
+            <textarea id="kitDesc" rows="2" placeholder="Breve descripción del sistema o modelo..."></textarea>
+
+            <label>Creador:</label>
+            <input type="text" id="kitCreador" placeholder="Ej: Creador: Estudio Dev">
+
+            <label>Enlace de Imagen (URL de portada):</label>
+            <input type="text" id="kitImagen" placeholder="https://i.ibb.co/...">
+
+            <label>ID Numérico de Roblox:</label>
+            <input type="text" id="kitRobloxId" placeholder="Ej: 11873107243615">
+
+            <div class="modal-buttons">
+                <button class="btn-save" onclick="guardarKit()">Guardar Kit</button>
+                <button class="btn-cancel" onclick="cerrarModal()">Cerrar</button>
+            </div>
+
+            <hr style="margin: 15px 0; border-color: #2a3442;">
+            <h4 style="font-size: 13px; margin-bottom: 8px; color: #f39c12;">Administrar y Borrar Kits Publicados:</h4>
+            <div id="listaAdminKits" style="max-height: 180px; overflow-y: auto;"></div>
+        </div>
+    </div>
+
+    <script>
+        // Kits iniciales por defecto (idénticos a los de tu video)
+        let kitsPorDefecto = [
+            {
+                id: 1,
+                nombre: "Sistema de Boss para Roblox",
+                categoria: "Alta Demanda",
+                desc: "Increíble sistema de boss completo con barras de vida, fases de batalla y mecánicas listas para usar.",
+                creador: "Creador: Estudio Dev",
+                imagen: "https://i.ibb.co/FjvZ0mf/SAVE-20261018-014101.jpg",
+                robloxId: "11873107243615"
+            },
+            {
+                id: 2,
+                nombre: "Kit de Roba un Brainrot",
+                categoria: "Kits",
+                desc: "Espero que lo disfrutes y puedas personalizar tu juego.",
+                creador: "Creador: Devfran (TikTok)",
+                imagen: "https://i.ibb.co/FjvZ0mf/SAVE-20261018-014101.jpg",
+                robloxId: "95870844429217"
+            },
+            {
+                id: 3,
+                nombre: "Decoración de Halloween",
+                categoria: "Modelos",
+                desc: "Elementos temáticos para tus eventos de terror en el juego.",
+                creador: "Creador: @RbxiProductinc (Roblox)",
+                imagen: "https://i.ibb.co/FjvZ0mf/SAVE-20261018-014101.jpg",
+                robloxId: "90402705071528"
+            },
+            {
+                id: 4,
+                nombre: "Free FPS KIT V1",
+                categoria: "Scripts",
+                desc: "Sistema de disparo en primera persona totalmente optimizado.",
+                creador: "Creador: PurlyDev",
+                imagen: "https://i.ibb.co/FjvZ0mf/SAVE-20261018-014101.jpg",
+                robloxId: "9750178951"
+            }
+        ];
+
+        // Cargar desde localStorage o usar los predeterminados
+        let kits = JSON.parse(localStorage.getItem('studio_devs_app_kits')) || kitsPorDefecto;
+        let categoriaActual = 'Todos';
+
+        function pedirPassword() {
+            let pass = prompt("Introduce la contraseña de administrador:");
+            if (pass === "Juan23837707") {
+                abrirAdminModal();
+            } else if (pass !== null) {
+                alert("❌ Contraseña incorrecta.");
+            }
+        }
+
+        function abrirAdminModal() {
+            document.getElementById('adminModal').style.display = 'flex';
+            limpiarFormulario();
+            renderizarAdminKits();
+        }
+
+        function cerrarModal() {
+            document.getElementById('adminModal').style.display = 'none';
+            renderizarKits();
+        }
+
+        function limpiarFormulario() {
+            document.getElementById('kitId').value = '';
+            document.getElementById('kitNombre').value = '';
+            document.getElementById('kitDesc').value = '';
+            document.getElementById('kitCreador').value = '';
+            document.getElementById('kitImagen').value = '';
+            document.getElementById('kitRobloxId').value = '';
+        }
+
+        function guardarKit() {
+            let id = document.getElementById('kitId').value;
+            let nombre = document.getElementById('kitNombre').value;
+            let categoria = document.getElementById('kitCategoria').value;
+            let desc = document.getElementById('kitDesc').value;
+            let creador = document.getElementById('kitCreador').value;
+            let imagen = document.getElementById('kitImagen').value || "https://i.ibb.co/FjvZ0mf/SAVE-20261018-014101.jpg";
+            let robloxId = document.getElementById('kitRobloxId').value;
+
+            if(!nombre || !robloxId) {
+                alert("Por favor completa al menos el Nombre y el ID de Roblox.");
+                return;
+            }
+
+            if(id === "") {
+                let nuevoKit = { id: Date.now(), nombre, categoria, desc, creador, imagen, robloxId };
+                kits.push(nuevoKit);
+            } else {
+                let index = kits.findIndex(k => k.id == id);
+                if(index !== -1) {
+                    kits[index].nombre = nombre;
+                    kits[index].categoria = categoria;
+                    kits[index].desc = desc;
+                    kits[index].creador = creador;
+                    kits[index].imagen = imagen;
+                    kits[index].robloxId = robloxId;
+                }
+            }
+
+            localStorage.setItem('studio_devs_app_kits', JSON.stringify(kits));
+            limpiarFormulario();
+            renderizarAdminKits();
+            renderizarKits();
+            alert("✅ ¡Kit guardado correctamente!");
+        }
+
+        function renderizarAdminKits() {
+            let contenedor = document.getElementById('listaAdminKits');
+            if(kits.length === 0) {
+                contenedor.innerHTML = "<p style='color:#8b949e; font-size:12px;'>No hay kits publicados.</p>";
+                return;
+            }
+            contenedor.innerHTML = "";
+            kits.forEach(kit => {
+                contenedor.innerHTML += `
+                    <div class="admin-item">
+                        <div><strong>${kit.nombre}</strong><br><small style="color:#8b949e;">[${kit.categoria}]</small></div>
+                        <div class="admin-actions">
+                            <button class="btn-edit" onclick="prepararEdicion(${kit.id})">Editar</button>
+                            <button class="btn-del" onclick="borrarKit(${kit.id})">Borrar</button>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        function prepararEdicion(id) {
+            let kit = kits.find(k => k.id == id);
+            if(kit) {
+                document.getElementById('kitId').value = kit.id;
+                document.getElementById('kitNombre').value = kit.nombre;
+                document.getElementById('kitCategoria').value = kit.categoria;
+                document.getElementById('kitDesc').value = kit.desc;
+                document.getElementById('kitCreador').value = kit.creador;
+                document.getElementById('kitImagen').value = kit.imagen;
+                document.getElementById('kitRobloxId').value = kit.robloxId;
+            }
+        }
+
+        function borrarKit(id) {
+            if(confirm("¿Estás seguro de eliminar este kit?")) {
+                kits = kits.filter(k => k.id != id);
+                localStorage.setItem('studio_devs_app_kits', JSON.stringify(kits));
+                renderizarAdminKits();
+                renderizarKits();
+            }
+        }
+
+        function cambiarCategoria(cat, btn) {
+            categoriaActual = cat;
+            document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            renderizarKits();
+        }
+
+        function filtrarKits() {
+            renderizarKits();
+        }
+
+        function renderizarKits() {
+            let contenedor = document.getElementById('cardsContainer');
+            let textoBusqueda = document.getElementById('searchInput').value.toLowerCase();
+            
+            let filtrados = kits.filter(kit => {
+                let coincideCategoria = (categoriaActual === 'Todos' || kit.categoria === categoriaActual);
+                let coincideBusqueda = kit.nombre.toLowerCase().includes(textoBusqueda) || 
+                                       (kit.creador && kit.creador.toLowerCase().includes(textoBusqueda));
+                return coincideCategoria && coincideBusqueda;
+            });
+
+            if(filtrados.length === 0) {
+                contenedor.innerHTML = `<div class="no-results">No se encontraron resultados.</div>`;
+                return;
+            }
+
+            contenedor.innerHTML = "";
+            filtrados.forEach(kit => {
+                contenedor.innerHTML += `
+                    <div class="card">
+                        <img src="${kit.imagen}" class="card-img" alt="Imagen del kit">
+                        <div class="card-body">
+                            <div class="card-title">${kit.nombre}</div>
+                            <div class="card-desc">${kit.desc || ''}</div>
+                            <div class="card-creator">${kit.creador || ''}</div>
+                            <div class="card-footer">
+                                <span class="card-id">ID: ${kit.robloxId}</span>
+                                <button class="copy-btn" onclick="copiarId('${kit.robloxId}')">Copiar ID</button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        function copiarId(id) {
+            navigator.clipboard.writeText(id).then(() => {
+                alert("📋 ¡ID copiado al portapapeles: " + id + "!");
+            }).catch(err => {
+                // Alternativa para navegadores móviles estrictos
+                let dummy = document.cr
